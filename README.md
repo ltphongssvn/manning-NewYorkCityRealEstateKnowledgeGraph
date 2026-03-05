@@ -60,6 +60,8 @@ Three node types and three relationship types encode ownership across data sourc
 
 **Infrastructure:** Docker (multi-stage) · Railway · GitHub Actions CI (5 jobs)
 
+**GPU Cluster (Harvard OOD):** 4× NVIDIA L4 (23GB VRAM each) · CUDA 12.8 · Driver 570.172.08 · TensorFlow 2.20 · PyTorch 2.10
+
 **Testing:** pytest + vitest · 80% per-file coverage enforced · TDD (Red-Green-Refactor)
 
 **Security:** pre-commit/pre-push hooks · detect-secrets · SECURITY.md
