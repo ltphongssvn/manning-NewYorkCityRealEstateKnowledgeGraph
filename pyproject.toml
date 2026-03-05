@@ -8,9 +8,9 @@ dependencies = [
     "uvicorn[standard]>=0.32.0",
     "neo4j>=5.26.0",
     "pandas>=2.2.0",
-    "numpy>=2.0.0",
+    "numpy>=1.24.0,<2.0.0",
     "scikit-learn>=1.5.0",
-    "node2vec>=0.4.6",
+
     "pykeen>=1.10.0",
     "stellargraph>=1.2.1",
     "networkx>=3.4.0",
