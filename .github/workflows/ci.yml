@@ -1,0 +1,83 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.11"
+      - run: uv sync
+      - run: uv run pytest --cov=backend --cov-report=term-missing --cov-branch -q
+
+  frontend-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: |
+          if [ -f frontend/package.json ]; then
+            cd frontend && npm ci && npx vitest run --passWithNoTests
+          else
+            echo "No frontend yet, skipping"
+          fi
+
+  neo4j-integration:
+    runs-on: ubuntu-latest
+    services:
+      neo4j:
+        image: neo4j:5.26
+        env:
+          NEO4J_AUTH: neo4j/testpassword  # pragma: allowlist secret
+          NEO4J_PLUGINS: '["apoc"]'
+        ports:
+          - 7687:7687
+          - 7474:7474
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p testpassword 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.11"
+      - run: uv sync
+      - run: uv run pytest -m e2e -q --tb=short
+        env:
+          NEO4J_URI: bolt://localhost:7687
+          NEO4J_USERNAME: neo4j
+          NEO4J_PASSWORD: testpassword  # pragma: allowlist secret
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install detect-secrets
+      - run: detect-secrets audit .secrets.baseline || true
+      - run: detect-secrets scan --baseline .secrets.baseline
+
+  docker-build:
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-tests, security-scan]
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          if [ -f Dockerfile ]; then
+            docker build -t nyc-real-estate-kg:ci .
+          else
+            echo "No Dockerfile yet, skipping"
+          fi
