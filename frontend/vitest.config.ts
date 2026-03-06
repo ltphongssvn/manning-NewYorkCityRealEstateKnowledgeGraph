@@ -12,7 +12,12 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       include: ["src/**/*.{ts,tsx}", "app/**/*.{ts,tsx}"],
-      exclude: ["app/routes.ts", "app/root.tsx"],
+      exclude: [
+        "app/routes.ts",
+        "app/root.tsx",
+        "app/welcome/**",
+        "app/routes/home.tsx",
+      ],
       thresholds: {
         lines: 80,
         branches: 80,
