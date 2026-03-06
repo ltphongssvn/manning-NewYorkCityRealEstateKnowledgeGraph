@@ -86,3 +86,16 @@ def test_stats_has_bbl_nodes_key():
 def test_recommend_default_n_returns_200():
     response = client.get("/api/recommend/1008350041?n=3")
     assert response.status_code == 200
+
+
+def test_recommend_bbl_not_in_embeddings_returns_404():
+    """Given BBL not in embeddings, When recommend called, Then 404."""
+    response = client.get("/api/recommend/0000000000")
+    assert response.status_code == 404
+
+
+def test_traverse_default_hops():
+    """Given valid BBL with default hops, When traverse called, Then returns edges key."""
+    response = client.post("/api/graph/traverse", json={"bbl": "1008350041", "hops": 1})
+    assert response.status_code == 200
+    assert "edges" in response.json()
