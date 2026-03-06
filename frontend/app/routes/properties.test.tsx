@@ -1,11 +1,16 @@
 // frontend/app/routes/properties.test.tsx
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import Properties from "./properties";
+import Properties, { meta } from "./properties";
 
 global.fetch = vi.fn();
 
 describe("Properties route", () => {
+  it("meta returns correct title", () => {
+    const result = meta({} as any);
+    expect(result[0]).toEqual({ title: "Properties | NYC Real Estate KG" });
+  });
+
   it("renders heading and input", () => {
     render(<Properties />);
     expect(screen.getByText("Property Search")).toBeTruthy();
