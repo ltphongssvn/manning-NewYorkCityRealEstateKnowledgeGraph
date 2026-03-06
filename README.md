@@ -11,21 +11,21 @@ This project constructs a knowledge graph linking properties (BBL), owners, and 
 ## Architecture
 ```
 ┌──────────────────────────────────────────────────────────────┐
-│                    Mobile App (React Native)                  │
-│              Expo SDK · Neo4j queries · Graph viz             │
+│                    Mobile App (React Native)                 │
+│              Expo SDK · Neo4j queries · Graph viz            │
 ├──────────────────────────────────────────────────────────────┤
-│                  Web Frontend (React + TypeScript)            │
-│              Vite · Neo4j Browser · Graph visualization       │
+│                  Web Frontend (React + TypeScript)           │
+│              Vite · Neo4j Browser · Graph visualization      │
 ├──────────────────────────────────────────────────────────────┤
-│                     FastAPI Backend                           │
-│         /api/graph  /api/owners  /api/properties              │
-│              Neo4j Python driver · Cypher queries             │
+│                     FastAPI Backend                          │
+│         /api/graph  /api/owners  /api/properties             │
+│              Neo4j Python driver · Cypher queries            │
 ├──────────────────────────────────────────────────────────────┤
-│                     Neo4j Graph Database                      │
-│    Nodes: BBL · OWNER · CONTACT_ADDRESS                       │
-│    Edges: TAX_ASSESSOR_OWNER · DEED_OWNER · PERMIT_OWNER      │
+│                     Neo4j Graph Database                     │
+│    Nodes: BBL · OWNER · CONTACT_ADDRESS                      │
+│    Edges: TAX_ASSESSOR_OWNER · DEED_OWNER · PERMIT_OWNER     │
 ├──────────────────────────────────────────────────────────────┤
-│                  Docker (Multi-stage)                         │
+│                  Docker (Multi-stage)                        │
 │         Node 22 (build) → Python 3.12 (runtime)              │
 └──────────────────────────────────────────────────────────────┘
 ```

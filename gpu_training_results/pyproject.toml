@@ -1,0 +1,26 @@
+[project]
+name = "CS1090B_HW2"
+version = "1.0.0"
+description = "NYC Real Estate Knowledge Graph - GPU ML Pipeline"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "ipykernel",
+  "jupyterlab",
+  "matplotlib",
+  "numpy>=1.24.0,<2.0.0",
+  "pillow",
+  "tensorflow[and-cuda]>=2.16",
+  "tensorflow-hub",
+  "requests",
+  "pandas>=2.2.0",
+  "scikit-learn>=1.5.0",
+  "networkx>=3.4.0",
+  "thefuzz>=0.22.1",
+  "python-levenshtein>=0.26.0",
+  "seaborn>=0.13.0",
+  "neo4j>=5.26.0",
+  "pykeen>=1.10.0",
+  "stellargraph>=1.2.1",
+  "node2vec>=0.4.6",
+]
