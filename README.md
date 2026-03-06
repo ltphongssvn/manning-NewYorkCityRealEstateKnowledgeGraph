@@ -8,6 +8,26 @@ This project constructs a knowledge graph linking properties (BBL), owners, and 
 
 **Data Sources:** NYC Department of Finance (tax records, deeds) · NYC Department of Buildings (permits)
 
+** Test Data**
+
+**Properties route** (`/properties`):
+- BBL: `1008350041` → Empire State Building
+- BBL: `1000010010` → Governors Island
+- BBL: `1726130011` → AT&T Wireless
+
+**Owners route** (`/owners`):
+- `ESRT EMPIRE STATE BUILDING, L.L.C.`
+- `GOVERNORS ISLAND CORPORATION`
+- `NYC PARKS DEPT`
+
+**Graph route** (`/graph`):
+- BBL: `1008350041`
+- BBL: `1000010010`
+
+**Recommend route** (`/recommend`):
+- BBL: `1008350041` → returns 5 similar Manhattan properties
+- BBL: `1000010010`
+
 ## Architecture
 ```
 cat > README.md << 'EOF'
