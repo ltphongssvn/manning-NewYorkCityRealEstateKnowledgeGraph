@@ -10,24 +10,126 @@ This project constructs a knowledge graph linking properties (BBL), owners, and 
 
 ## Architecture
 ```
-┌──────────────────────────────────────────────────────────────┐
-│                    Mobile App (React Native)                 │
-│              Expo SDK · Neo4j queries · Graph viz            │
-├──────────────────────────────────────────────────────────────┤
-│                  Web Frontend (React + TypeScript)           │
-│              Vite · Neo4j Browser · Graph visualization      │
-├──────────────────────────────────────────────────────────────┤
-│                     FastAPI Backend                          │
-│         /api/graph  /api/owners  /api/properties             │
-│              Neo4j Python driver · Cypher queries            │
-├──────────────────────────────────────────────────────────────┤
-│                     Neo4j Graph Database                     │
-│    Nodes: BBL · OWNER · CONTACT_ADDRESS                      │
-│    Edges: TAX_ASSESSOR_OWNER · DEED_OWNER · PERMIT_OWNER     │
-├──────────────────────────────────────────────────────────────┤
-│                  Docker (Multi-stage)                        │
-│         Node 22 (build) → Python 3.12 (runtime)              │
-└──────────────────────────────────────────────────────────────┘
+cat > README.md << 'EOF'
+# NYC Real Estate Knowledge Graph
+
+A fullstack knowledge graph application for exploring NYC property ownership networks, built with Remix, FastAPI, Neo4j, and GPU-trained ML embeddings.
+
+## Architecture
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Client Browser                          │
+└──────────────────────┬──────────────────────────────────────┘
+│ HTTP :3000
+┌──────────────────────▼──────────────────────────────────────┐
+│              Remix SSR Frontend (React Router v7)           │
+│  routes: / | /properties | /owners | /graph | /recommend    │
+└──────────────────────┬──────────────────────────────────────┘
+│ HTTP :8000
+┌──────────────────────▼──────────────────────────────────────┐
+│                  FastAPI Backend (Python 3.11)              │
+│  GET  /api/health                                           │
+│  GET  /api/stats                                            │
+│  GET  /api/properties/{bbl}                                 │
+│  GET  /api/owners/{name}                                    │
+│  GET  /api/recommend/{bbl}   ← node2vec embeddings          │
+│  POST /api/graph/traverse                                   │
+└──────────┬──────────────────────────────┬───────────────────┘
+           │ bolt://7687                  │ numpy/sklearn
+┌──────────▼──────────┐  ┌────────────────▼────────────────┐
+│   Neo4j 5.26        │  │   GPU Training Results          │
+│   Graph Database    │  │   GPU Cluster (4× NVIDIA L4)    │
+│   BBL/OWNER nodes   │  │   23GB VRAM, CUDA 12.8          │
+│   OWNS edges        │  │                                 │
+└─────────────────────┘  │   outputs/embeddings/           │
+                         │   ├── node2vec_emb.txt (97K)    │
+                         │   ├── graphsage_emb.npy         │
+                         │   └── graphsage_nodes.npy       │
+                         │   outputs/models/               │
+                         │   ├── transe/ (GMR: 5.06)       │
+                         │   └── transr/ (GMR: 2482)       │
+                         └─────────────────────────────────┘
+```
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Remix / React Router v7, TailwindCSS, TypeScript |
+| Backend | FastAPI, Python 3.11, scikit-learn |
+| Graph DB | Neo4j 5.26, APOC |
+| ML Models | PyKEEN (TransE/TransR), node2vec, GraphSAGE |
+| GPU Hardware | 4× NVIDIA L4 (23GB VRAM each), CUDA 12.8 |
+| Infra | Docker, docker-compose, Railway |
+| Testing | pytest (100% coverage), vitest (80%+ coverage) |
+| CI/CD | GitHub Actions (6 jobs) |
+
+## GPU Training
+
+Training was performed on a GPU cluster:
+
+- **Hardware**: 4× NVIDIA L4 GPU (23GB VRAM each), CUDA 12.8, Driver 570.172.08
+- **Notebook**: `gpu_training_results/notebooks/nyc_knowledge_graph_gpu.ipynb`
+- **Pipeline**: 21 cells — data prep → deduplication → node2vec → TransE/TransR → GraphSAGE → KNN recommender
+
+### Training Results
+
+| Model | Metric | Value |
+|---|---|---|
+| TransE | Geometric Mean Rank | 5.06 |
+| TransR | Geometric Mean Rank | 2482.08 |
+| node2vec | Vocabulary Size | 97,189 nodes |
+| GraphSAGE | Embedding Shape | (96,867, 8) |
+
+## Data
+
+- **Source**: NYC Tax Property Features (100K records, 139 columns)
+- **Graph**: 172,658 nodes, 97,035 edges
+- **Unique BBLs**: 96,867
+- **Unique Owners**: 75,791 (after deduplication)
+
+## Project Structure
+```
+manning-NewYorkCityRealEstateKnowledgeGraph/
+├── backend/              # FastAPI app + tests (100% coverage)
+├── frontend/             # Remix SSR app + tests (80%+ coverage)
+│   └── app/routes/       # properties, owners, graph, recommend
+├── cypher/               # Neo4j Cypher scripts (milestones 2 & 3)
+├── gpu_training_results/ # GPU cluster outputs
+│   ├── notebooks/        # GPU Jupyter notebook
+│   └── outputs/          # embeddings, models, plots
+├── .github/workflows/    # CI: backend, frontend, e2e, security, docker
+├── Dockerfile            # Multi-stage: Node build + Python serve
+└── docker-compose.yml    # app + neo4j services
+```
+
+## Git Workflow
+
+GitFlow: `main` ← `develop` ← `feature/*`
+
+## Local Development
+```bash
+# Backend
+uv sync && uv run uvicorn backend.app:app --reload
+
+# Frontend
+cd frontend && npm install && npm run dev
+
+# Full stack
+docker compose up --build
+```
+
+## Milestones
+
+| Milestone | Description | Status |
+|---|---|---|
+| 1 | Data ingestion & graph construction | ✅ |
+| 2 | Owner deduplication & node2vec | ✅ |
+| 3 | TransE/TransR KG embeddings + GraphSAGE | ✅ |
+| 4 | FastAPI backend + Remix frontend | ✅ |
+| 5 | React Native mobile app | ✅ |
+| 6 | Railway deployment | ✅ |
+
 ```
 
 ## Knowledge Graph Schema
