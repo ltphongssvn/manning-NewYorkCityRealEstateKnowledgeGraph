@@ -1,0 +1,10 @@
+# .dockerignore
+frontend/node_modules
+frontend/.git
+**/__pycache__
+**/*.pyc
+.venv
+.git
+*.md
+.github
+gpu_training_results/outputs/models
