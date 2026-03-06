@@ -14,9 +14,9 @@ WORKDIR /app
 # Install Node for Remix SSR server
 RUN apt-get update && apt-get install -y nodejs npm && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps
-COPY pyproject.toml uv.lock .python-version ./
-RUN pip install --no-cache-dir uv && uv sync --no-dev
+# Install Python deps directly
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir fastapi uvicorn[standard] neo4j numpy scikit-learn pydantic
 
 # Copy backend
 COPY backend/ ./backend/
@@ -27,10 +27,7 @@ COPY --from=frontend-build /app/frontend/build ./frontend/build
 COPY --from=frontend-build /app/frontend/node_modules ./frontend/node_modules
 COPY --from=frontend-build /app/frontend/package.json ./frontend/package.json
 
-ENV PORT=8000
-EXPOSE 8000 3000
-
-# Start script runs both FastAPI and Remix
 COPY start.sh ./start.sh
 RUN chmod +x ./start.sh
+EXPOSE 8000 3000
 CMD ["./start.sh"]
