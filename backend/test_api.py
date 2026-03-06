@@ -1,6 +1,4 @@
-"""
-API integration tests - Given/When/Then, ZOMBIES coverage.
-"""
+"""API integration tests - Given/When/Then, ZOMBIES coverage."""
 import pytest
 from fastapi.testclient import TestClient
 from backend.app import app
@@ -17,14 +15,25 @@ def test_health_returns_ok():
 def test_stats_returns_node_counts():
     response = client.get("/api/stats")
     assert response.status_code == 200
-    data = response.json()
-    assert "nodes" in data
-    assert "edges" in data
+    assert "nodes" in response.json()
+    assert "edges" in response.json()
 
 
 def test_property_invalid_bbl_returns_404():
     response = client.get("/api/properties/invalid")
     assert response.status_code == 404
+
+
+def test_property_valid_bbl_returns_200():
+    response = client.get("/api/properties/1008350041")
+    assert response.status_code == 200
+    assert response.json()["bbl"] == "1008350041"
+
+
+def test_owners_returns_200():
+    response = client.get("/api/owners/EMPIRE STATE")
+    assert response.status_code == 200
+    assert response.json()["name"] == "EMPIRE STATE"
 
 
 def test_owners_empty_name_returns_422():
@@ -35,3 +44,15 @@ def test_owners_empty_name_returns_422():
 def test_recommend_unknown_bbl_returns_404():
     response = client.get("/api/recommend/9999999999")
     assert response.status_code == 404
+
+
+def test_recommend_valid_bbl_returns_200():
+    response = client.get("/api/recommend/1008350041")
+    assert response.status_code == 200
+    assert "recommendations" in response.json()
+
+
+def test_graph_traverse_returns_200():
+    response = client.post("/api/graph/traverse", json={"bbl": "1008350041", "hops": 2})
+    assert response.status_code == 200
+    assert "nodes" in response.json()
