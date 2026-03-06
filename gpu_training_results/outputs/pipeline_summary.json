@@ -1,0 +1,12 @@
+{
+  "tax_records": 99874,
+  "unique_bbls": 96867,
+  "unique_owners": 75796,
+  "owners_after_dedup": 75791,
+  "graph_nodes": 172658,
+  "graph_edges": 97035,
+  "node2vec_vocab": 97189,
+  "graphsage_emb_shape": "(96867, 8)",
+  "transe_gmr": 5.06,
+  "transr_gmr": 2482.08
+}
