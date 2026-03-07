@@ -29,4 +29,14 @@ describe('HomeScreen', () => {
     fireEvent.press(getByTestId('nav-owners'));
     expect(mockNavigate).toHaveBeenCalledWith('Owners');
   });
+  it('navigates to Graph on press', () => {
+    const { getByTestId } = render(<HomeScreen />);
+    fireEvent.press(getByTestId('nav-graph'));
+    expect(mockNavigate).toHaveBeenCalledWith('Graph');
+  });
+  it('navigates to Recommend on press', () => {
+    const { getByTestId } = render(<HomeScreen />);
+    fireEvent.press(getByTestId('nav-recommend'));
+    expect(mockNavigate).toHaveBeenCalledWith('Recommend');
+  });
 });
