@@ -45,11 +45,32 @@ export default function Graph() {
       </form>
       {error && <p className="text-red-400" data-testid="error-msg">{error}</p>}
       {result && (
-        <div className="bg-gray-800 rounded p-4" data-testid="result">
+        <div className="bg-gray-800 rounded p-4 space-y-4" data-testid="result">
           <p><span className="text-gray-400">BBL:</span> {result.bbl}</p>
-          <p><span className="text-gray-400">Nodes:</span> {result.nodes?.length ?? 0}</p>
-          <p><span className="text-gray-400">Edges:</span> {result.edges?.length ?? 0}</p>
-          <p className="text-gray-500 text-sm mt-2">{result.message}</p>
+          <div>
+            <p className="text-gray-400 mb-1">Nodes ({result.nodes?.length ?? 0}) — properties and owners:</p>
+            <ul className="ml-4 space-y-1">
+              {result.nodes?.map((n: any, i: number) => (
+                <li key={i} className="text-sm">
+                  <span className="text-green-400">[{n.labels?.join(", ")}]</span>
+                  <span className="text-white ml-2">
+                    {n.properties?.name ?? n.properties?.bbl ?? n.id}
+                  </span>
+                  {n.properties?.address && <span className="text-gray-400 ml-2">— {n.properties.address}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-gray-400 mb-1">Edges ({result.edges?.length ?? 0}) — ownership links:</p>
+            <ul className="ml-4 space-y-1">
+              {result.edges?.map((e: any, i: number) => (
+                <li key={i} className="text-sm text-gray-300">
+                  Node {e.start} <span className="text-green-400">—{e.type}→</span> Node {e.end}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </main>

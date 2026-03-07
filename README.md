@@ -8,6 +8,85 @@ This project constructs a knowledge graph linking properties (BBL), owners, and 
 
 **Data Sources:** NYC Department of Finance (tax records, deeds) · NYC Department of Buildings (permits)
 
+** Test Data**
+
+**Properties route (`/properties`):**
+
+| BBL | Address | Owner |
+|---|---|---|
+| `1008350041` | 5 AVENUE | ESRT EMPIRE STATE BUILDING, L.L.C. (Empire State Building) |
+| `1000010010` | COMFORT ROAD | GOVERNORS ISLAND CORPORATION |
+| `1000010111` | ANDES ROAD | GOVERNORS ISLAND CORPORATION |
+
+**BBL: 1008350041**
+NYC's unique property ID (Borough-Block-Lot). Borough 1 = Manhattan.
+
+**Address: 5 AVENUE**
+Street address of the property per NYC tax records.
+
+**Owners (1):**
+Number of ownership records found.
+
+**ESRT EMPIRE STATE BUILDING, L.L.C.**
+Legal name of the owner as recorded in NYC tax rolls.
+
+**(TAX_ASSESSOR_OWNER)**
+How ownership was recorded — `TAX_ASSESSOR_OWNER` means this comes from NYC's official tax assessment database.
+
+**Owners route** (`/owners`):
+- `ESRT EMPIRE STATE BUILDING, L.L.C.`
+- `GOVERNORS ISLAND CORPORATION`
+- `NYC PARKS DEPT`
+
+**Owner: ESRT EMPIRE STATE BUILDING, L.L.C.**
+Legal company name that owns the property.
+
+**Properties (1):**
+Total number of NYC properties this owner controls.
+
+**1008350041**
+BBL (unique NYC property ID) of the owned property.
+
+**5 AVENUE**
+Street address of that property.
+
+**(TAX_ASSESSOR_OWNER)**
+Ownership source — recorded in NYC's official tax assessment database.
+
+**Graph route** (`/graph`):
+- BBL: `1008350041`
+- BBL: `1000010010`
+
+**BBL: 1008350041**
+The property being explored.
+
+**Nodes (2) — properties and owners:**
+Every entity in the ownership network.
+- **[BBL] 1008350041 — 5 AVENUE** → the physical property
+- **[OWNER] ESRT EMPIRE STATE BUILDING, L.L.C.** → the legal owner
+
+**Edges (1) — ownership links:**
+Connections between owners and properties.
+- **Node 99109 —TAX_ASSESSOR_OWNER→ Node 98214** → the owner (99109) holds this property (98214) per NYC tax records
+
+**Recommend route** (`/recommend`):
+- BBL: `1008350041` → returns 5 similar Manhattan properties
+- BBL: `1000010010`
+
+**Query BBL: 1008350041**
+The property you searched for (Empire State Building).
+
+**Top 5 similar properties by ownership network:**
+Properties whose ownership patterns most closely resemble your query property, ranked by similarity.
+
+**BBL (e.g. 1008597501)**
+NYC property ID of the similar property.
+
+**Similarity distance (e.g. 0.2755)**
+How similar the ownership pattern is — closer to 0.0 = nearly identical network structure, closer to 1.0 = very different. All results under 0.3 indicate strong similarity.
+
+Similarity is based on **who owns what and how they connect** across all 97,000 NYC properties — not physical location or building type.
+
 ## Architecture
 ```
 cat > README.md << 'EOF'
@@ -57,7 +136,7 @@ A fullstack knowledge graph application for exploring NYC property ownership net
 |---|---|
 | Frontend | Remix / React Router v7, TailwindCSS, TypeScript |
 | Backend | FastAPI, Python 3.11, scikit-learn |
-| Graph DB | Neo4j 5.26, APOC |
+| Graph DB | Neo4j 5.26 (local Docker), Neo4j AuraDB Free (production) |
 | ML Models | PyKEEN (TransE/TransR), node2vec, GraphSAGE |
 | GPU Hardware | 4× NVIDIA L4 (23GB VRAM each), CUDA 12.8 |
 | Infra | Docker, docker-compose, Railway |
@@ -71,6 +150,15 @@ Training was performed on a GPU cluster:
 - **Hardware**: 4× NVIDIA L4 GPU (23GB VRAM each), CUDA 12.8, Driver 570.172.08
 - **Notebook**: `gpu_training_results/notebooks/nyc_knowledge_graph_gpu.ipynb`
 - **Pipeline**: 21 cells — data prep → deduplication → node2vec → TransE/TransR → GraphSAGE → KNN recommender
+
+## Neo4j Database
+
+| Environment | Connection |
+|---|---|
+| Local (Docker) | `bolt://localhost:7687` (neo4j:5.26 container) |
+| Production | Neo4j AuraDB Free (`neo4j+s://3deb10fd.databases.neo4j.io`) |
+
+Data is seeded via `cypher/seed_neo4j.py` — batch-loads 100K NYC tax records (BBL + OWNER nodes, TAX_ASSESSOR_OWNER relationships) into AuraDB using `MERGE` in batches of 1,000.
 
 ### Training Results
 

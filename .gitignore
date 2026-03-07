@@ -14,27 +14,22 @@ build/
 htmlcov/
 coverage.xml
 *.log
-
 # uv
 uv.lock
-
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb_checkpoints
-
 # Neo4j
 *.dump
 neo4j/data/
 neo4j/logs/
 neo4j/import/
 neo4j/plugins/
-
 # Data files (large CSVs)
 backend/data/*.csv
 data/*.csv
 *.parquet
 *.sqlite3
-
 # ML model files
 *.h5
 *.pkl
@@ -42,8 +37,8 @@ data/*.csv
 *.onnx
 *.bin
 models/
-embeddings/
-
+gpu_training_results/outputs/embeddings/node2vec_emb.txt
+gpu_training_results/outputs/models/
 # Node / Frontend
 node_modules/
 frontend/node_modules/
@@ -51,27 +46,22 @@ mobile/node_modules/
 frontend/dist/
 frontend/coverage/
 .npm/
-
 # Mobile / Expo
 mobile/.expo/
 mobile/android/
 mobile/ios/
 *.apk
 *.ipa
-
 # Docker
 .dockerignore
-
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-
 # OS
 .DS_Store
 Thumbs.db
-
 # Secrets
 *.pem
 *.key

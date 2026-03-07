@@ -30,7 +30,7 @@ export default function Owners() {
       <form onSubmit={handleSearch} className="flex gap-3 mb-6">
         <input
           className="flex-1 px-4 py-2 bg-gray-800 rounded border border-gray-600 focus:outline-none"
-          placeholder="Enter owner name (e.g. EMPIRE STATE)"
+          placeholder="Enter owner name (e.g. ESRT EMPIRE STATE BUILDING, L.L.C.)"
           value={name}
           onChange={e => setName(e.target.value)}
           data-testid="owner-input"
@@ -41,10 +41,18 @@ export default function Owners() {
       </form>
       {error && <p className="text-red-400" data-testid="error-msg">{error}</p>}
       {result && (
-        <div className="bg-gray-800 rounded p-4" data-testid="result">
+        <div className="bg-gray-800 rounded p-4 space-y-2" data-testid="result">
           <p><span className="text-gray-400">Owner:</span> {result.name}</p>
-          <p><span className="text-gray-400">Properties:</span> {result.properties?.length ?? 0}</p>
-          <p className="text-gray-500 text-sm mt-2">{result.message}</p>
+          <p><span className="text-gray-400">Properties ({result.properties?.length ?? 0}):</span></p>
+          <ul className="ml-4 space-y-1">
+            {result.properties?.map((p: any, i: number) => (
+              <li key={i} className="text-sm">
+                <span className="text-yellow-400">{p.bbl}</span>
+                {p.address && <span className="text-white ml-2">{p.address}</span>}
+                <span className="text-gray-500 ml-2">({p.relationship})</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </main>

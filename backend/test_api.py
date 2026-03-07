@@ -1,12 +1,25 @@
 """API integration tests - Given/When/Then, ZOMBIES coverage."""
 import numpy as np
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 import backend.app as app_module
 from backend.app import app
 
 client = TestClient(app)
+
+
+def make_mock_driver(records=None):
+    mock_result = MagicMock()
+    mock_result.__iter__ = MagicMock(return_value=iter(records or []))
+    mock_result.single = MagicMock(return_value={"c": 0})
+    mock_session = MagicMock()
+    mock_session.__enter__ = MagicMock(return_value=mock_session)
+    mock_session.__exit__ = MagicMock(return_value=False)
+    mock_session.run = MagicMock(return_value=mock_result)
+    mock_driver = MagicMock()
+    mock_driver.session = MagicMock(return_value=mock_session)
+    return mock_driver
 
 
 def test_health_returns_ok():
@@ -21,14 +34,16 @@ def test_health_has_embeddings_key():
 
 
 def test_stats_returns_node_counts():
-    response = client.get("/api/stats")
+    with patch("backend.app.get_driver", return_value=make_mock_driver()):
+        response = client.get("/api/stats")
     assert response.status_code == 200
     assert "nodes" in response.json()
     assert "edges" in response.json()
 
 
 def test_stats_has_bbl_nodes_key():
-    response = client.get("/api/stats")
+    with patch("backend.app.get_driver", return_value=make_mock_driver()):
+        response = client.get("/api/stats")
     assert "bbl_nodes" in response.json()
 
 
@@ -38,13 +53,25 @@ def test_property_invalid_bbl_returns_404():
 
 
 def test_property_valid_bbl_returns_200():
-    response = client.get("/api/properties/1008350041")
+    record = MagicMock()
+    record.__getitem__ = lambda self, k: "ESRT EMPIRE STATE" if k == "owner" else "TAX_ASSESSOR_OWNER"
+    with patch("backend.app.get_driver", return_value=make_mock_driver([record])):
+        response = client.get("/api/properties/1008350041")
     assert response.status_code == 200
     assert response.json()["bbl"] == "1008350041"
 
 
+def test_property_not_found_returns_404():
+    with patch("backend.app.get_driver", return_value=make_mock_driver([])):
+        response = client.get("/api/properties/1008350041")
+    assert response.status_code == 404
+
+
 def test_owners_returns_200():
-    response = client.get("/api/owners/EMPIRE STATE")
+    record = MagicMock()
+    record.__getitem__ = lambda self, k: {"bbl": "1008350041", "address": "350 5TH AVE", "rel": "TAX_ASSESSOR_OWNER"}[k]
+    with patch("backend.app.get_driver", return_value=make_mock_driver([record])):
+        response = client.get("/api/owners/EMPIRE STATE")
     assert response.status_code == 200
     assert response.json()["name"] == "EMPIRE STATE"
 
@@ -55,8 +82,17 @@ def test_owners_empty_name_returns_422():
 
 
 def test_owners_special_chars_returns_200():
-    response = client.get("/api/owners/NYC PARKS DEPT")
+    record = MagicMock()
+    record.__getitem__ = lambda self, k: {"bbl": "1000010010", "address": "PARK", "rel": "TAX_ASSESSOR_OWNER"}[k]
+    with patch("backend.app.get_driver", return_value=make_mock_driver([record])):
+        response = client.get("/api/owners/NYC PARKS DEPT")
     assert response.status_code == 200
+
+
+def test_owners_not_found_returns_404():
+    with patch("backend.app.get_driver", return_value=make_mock_driver([])):
+        response = client.get("/api/owners/UNKNOWN OWNER")
+    assert response.status_code == 404
 
 
 def test_recommend_unknown_bbl_returns_404():
@@ -97,7 +133,19 @@ def test_recommend_default_n_returns_200(monkeypatch):
 
 
 def test_graph_traverse_returns_200():
-    response = client.post("/api/graph/traverse", json={"bbl": "1008350041", "hops": 2})
+    mock_node = MagicMock()
+    mock_node.id = 1
+    mock_node.labels = ["BBL"]
+    mock_node.__iter__ = MagicMock(return_value=iter([("bbl", "1008350041")]))
+    mock_rel = MagicMock()
+    mock_rel.id = 1
+    mock_rel.type = "TAX_ASSESSOR_OWNER"
+    mock_rel.start_node.id = 1
+    mock_rel.end_node.id = 2
+    record = MagicMock()
+    record.__getitem__ = lambda self, k: [mock_node] if k == "ns" else [mock_rel]
+    with patch("backend.app.get_driver", return_value=make_mock_driver([record])):
+        response = client.post("/api/graph/traverse", json={"bbl": "1008350041", "hops": 2})
     assert response.status_code == 200
     assert "nodes" in response.json()
 
@@ -108,9 +156,27 @@ def test_graph_traverse_invalid_bbl_returns_404():
 
 
 def test_traverse_default_hops():
-    response = client.post("/api/graph/traverse", json={"bbl": "1008350041", "hops": 1})
+    mock_node = MagicMock()
+    mock_node.id = 1
+    mock_node.labels = ["BBL"]
+    mock_node.__iter__ = MagicMock(return_value=iter([("bbl", "1008350041")]))
+    mock_rel = MagicMock()
+    mock_rel.id = 1
+    mock_rel.type = "TAX_ASSESSOR_OWNER"
+    mock_rel.start_node.id = 1
+    mock_rel.end_node.id = 2
+    record = MagicMock()
+    record.__getitem__ = lambda self, k: [mock_node] if k == "ns" else [mock_rel]
+    with patch("backend.app.get_driver", return_value=make_mock_driver([record])):
+        response = client.post("/api/graph/traverse", json={"bbl": "1008350041", "hops": 1})
     assert response.status_code == 200
     assert "edges" in response.json()
+
+
+def test_graph_traverse_not_found_returns_404():
+    with patch("backend.app.get_driver", return_value=make_mock_driver([])):
+        response = client.post("/api/graph/traverse", json={"bbl": "1008350041", "hops": 2})
+    assert response.status_code == 404
 
 
 def test_recommend_fewer_than_2_bbl_keys_returns_empty(monkeypatch):

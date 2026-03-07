@@ -17,15 +17,19 @@ describe("Owners route", () => {
     expect(screen.getByTestId("owner-input")).toBeTruthy();
   });
 
-  it("shows result on successful fetch", async () => {
+  it("shows properties with bbl and address on successful fetch", async () => {
     (global.fetch as any).mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ name: "EMPIRE STATE", properties: [], message: "ok" }),
+      json: async () => ({
+        name: "ESRT EMPIRE STATE BUILDING, L.L.C.",
+        properties: [{ bbl: "1008350041", address: "5 AVENUE", relationship: "TAX_ASSESSOR_OWNER" }],
+      }),
     });
     render(<Owners />);
-    fireEvent.change(screen.getByTestId("owner-input"), { target: { value: "EMPIRE STATE" } });
+    fireEvent.change(screen.getByTestId("owner-input"), { target: { value: "ESRT EMPIRE STATE BUILDING, L.L.C." } });
     fireEvent.submit(screen.getByRole("button"));
     await waitFor(() => expect(screen.getByTestId("result")).toBeTruthy());
+    expect(screen.getByText("1008350041")).toBeTruthy();
   });
 
   it("shows error on failed fetch", async () => {
