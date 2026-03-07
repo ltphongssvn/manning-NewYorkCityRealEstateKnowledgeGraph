@@ -77,3 +77,5 @@ Thumbs.db
 *.key
 *.cert
 *.p12
+!gpu_training_results/outputs/embeddings/node2vec_keys.npy
+!gpu_training_results/outputs/embeddings/node2vec_vecs.npy
