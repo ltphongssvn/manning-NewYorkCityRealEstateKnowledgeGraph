@@ -41,10 +41,18 @@ export default function Properties() {
       </form>
       {error && <p className="text-red-400" data-testid="error-msg">{error}</p>}
       {result && (
-        <div className="bg-gray-800 rounded p-4" data-testid="result">
+        <div className="bg-gray-800 rounded p-4 space-y-2" data-testid="result">
           <p><span className="text-gray-400">BBL:</span> {result.bbl}</p>
-          <p><span className="text-gray-400">Owners:</span> {result.owners?.length ?? 0}</p>
-          <p className="text-gray-500 text-sm mt-2">{result.message}</p>
+          <p><span className="text-gray-400">Address:</span> {result.owners?.[0]?.address ?? "N/A"}</p>
+          <p><span className="text-gray-400">Owners ({result.owners?.length ?? 0}):</span></p>
+          <ul className="ml-4 space-y-1">
+            {result.owners?.map((o: any, i: number) => (
+              <li key={i} className="text-sm">
+                <span className="text-white">{o.name}</span>
+                <span className="text-gray-500 ml-2">({o.relationship})</span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </main>
