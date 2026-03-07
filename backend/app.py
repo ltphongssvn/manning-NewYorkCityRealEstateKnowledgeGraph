@@ -1,5 +1,4 @@
 """FastAPI backend for NYC Real Estate Knowledge Graph."""
-import os
 import numpy as np
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
@@ -121,7 +120,7 @@ def recommend(bbl: str, n: int = 5):
     knn = NearestNeighbors(n_neighbors=min(n + 1, len(bbl_keys)), metric='cosine')
     knn.fit(matrix)
     distances, indices = knn.kneighbors(matrix[idx].reshape(1, -1))
-    recs = [{"bbl": bbl_keys[i], "distance": round(distances[0][j + 1], 4)}
+    recs = [{"bbl": bbl_keys[i], "distance": round(float(distances[0][j + 1]), 4)}
             for j, i in enumerate(indices[0][1:])]
     return {"bbl": bbl, "recommendations": recs}
 
