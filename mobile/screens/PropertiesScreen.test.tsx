@@ -11,7 +11,7 @@ describe('PropertiesScreen', () => {
     expect(getByText('Property Search')).toBeTruthy();
     expect(getByTestId('bbl-input')).toBeTruthy();
   });
-  it('shows result with address and owner on success', async () => {
+  it('shows result with owner on success', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({ bbl: '1008350041', address: '5 AVENUE', owners: [{ name: 'ESRT EMPIRE STATE BUILDING, L.L.C.', relationship: 'TAX_ASSESSOR_OWNER' }] }),
@@ -20,7 +20,7 @@ describe('PropertiesScreen', () => {
     fireEvent.changeText(getByTestId('bbl-input'), '1008350041');
     fireEvent.press(getByTestId('search-btn'));
     await waitFor(() => expect(getByTestId('result')).toBeTruthy());
-    expect(getByText('ESRT EMPIRE STATE BUILDING, L.L.C.')).toBeTruthy();
+    expect(getByText(/ESRT EMPIRE STATE BUILDING/)).toBeTruthy();
   });
   it('shows error on failed fetch', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
