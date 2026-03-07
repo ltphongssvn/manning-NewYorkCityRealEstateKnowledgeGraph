@@ -43,7 +43,7 @@ export default function Properties() {
       {result && (
         <div className="bg-gray-800 rounded p-4 space-y-2" data-testid="result">
           <p><span className="text-gray-400">BBL:</span> {result.bbl}</p>
-          <p><span className="text-gray-400">Address:</span> {result.owners?.[0]?.address ?? "N/A"}</p>
+          <p><span className="text-gray-400">Address:</span> {result.address ?? "N/A"}</p>
           <p><span className="text-gray-400">Owners ({result.owners?.length ?? 0}):</span></p>
           <ul className="ml-4 space-y-1">
             {result.owners?.map((o: any, i: number) => (

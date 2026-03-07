@@ -102,13 +102,13 @@ def get_property(bbl: str):
         driver = get_driver()
         with driver.session() as session:
             result = session.run(
-                "MATCH (b:BBL {bbl: $bbl})<-[r]-(o:OWNER) RETURN o.name AS owner, type(r) AS rel",
+                "MATCH (b:BBL {bbl: $bbl})<-[r]-(o:OWNER) RETURN o.name AS owner, type(r) AS rel, b.address AS address",
                 bbl=bbl
             )
-            owners = [{"name": r["owner"], "relationship": r["rel"]} for r in result]
+            owners = [{"name": r["owner"], "relationship": r["rel"], "address": r["address"]} for r in result]
         if not owners:
             raise HTTPException(status_code=404, detail=f"BBL {bbl} not found")
-        return {"bbl": bbl, "owners": owners}
+        return {"bbl": bbl, "address": owners[0]["address"], "owners": owners}
     except HTTPException:
         raise
     except Exception as e:
