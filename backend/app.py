@@ -164,16 +164,15 @@ def traverse(req: TraverseRequest):
         bbl = format_bbl(req.bbl)
     except ValueError:
         raise HTTPException(status_code=404, detail=f"Invalid BBL: {req.bbl}")
+    hops = max(1, min(req.hops, 3))
     try:
         driver = get_driver()
         with driver.session() as session:
-            result = session.run(
-                """
-                MATCH path = (b:BBL {bbl: $bbl})<-[*1..$hops]-(n)
+            query = f"""
+                MATCH path = (b:BBL {{bbl: $bbl}})<-[*1..{hops}]-(n)
                 RETURN nodes(path) AS ns, relationships(path) AS rs
-                """,
-                bbl=bbl, hops=req.hops
-            )
+            """
+            result = session.run(query, bbl=bbl)
             nodes_set = {}
             edges = []
             for record in result:
@@ -191,7 +190,7 @@ def traverse(req: TraverseRequest):
         nodes = list(nodes_set.values())
         if not nodes:
             raise HTTPException(status_code=404, detail=f"BBL {bbl} not found")
-        return {"bbl": bbl, "hops": req.hops, "nodes": nodes, "edges": edges}
+        return {"bbl": bbl, "hops": hops, "nodes": nodes, "edges": edges}
     except HTTPException:
         raise
     except Exception as e:
