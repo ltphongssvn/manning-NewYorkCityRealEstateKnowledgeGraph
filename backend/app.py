@@ -36,13 +36,20 @@ def _get_bbl_keys(embeddings: dict) -> list:
 
 
 def _load_embeddings(embeddings_dir: Path = EMBEDDINGS_DIR) -> tuple:
-    """Load node2vec embeddings from disk."""
+    """Load node2vec embeddings from numpy files, falling back to txt."""
     node2vec = {}
     bbl_nodes = []
-    emb_path = embeddings_dir / "node2vec_emb.txt"
+    keys_path = embeddings_dir / "node2vec_keys.npy"
+    vecs_path = embeddings_dir / "node2vec_vecs.npy"
+    txt_path = embeddings_dir / "node2vec_emb.txt"
     nodes_path = embeddings_dir / "graphsage_nodes.npy"
-    if emb_path.exists():
-        with open(emb_path) as f:
+
+    if keys_path.exists() and vecs_path.exists():
+        keys = np.load(keys_path, allow_pickle=True).tolist()
+        vecs = np.load(vecs_path, allow_pickle=True)
+        node2vec = {k: vecs[i] for i, k in enumerate(keys)}
+    elif txt_path.exists():
+        with open(txt_path) as f:
             header = next(f)
             expected_dim = int(header.strip().split()[1])
             for line in f:
@@ -51,6 +58,7 @@ def _load_embeddings(embeddings_dir: Path = EMBEDDINGS_DIR) -> tuple:
                     node2vec[key] = vec
                 except ValueError:
                     continue
+
     if nodes_path.exists():
         bbl_nodes = [n for n in np.load(nodes_path, allow_pickle=True).tolist()
                      if n in node2vec]
