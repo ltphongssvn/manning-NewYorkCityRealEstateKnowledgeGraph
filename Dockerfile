@@ -17,7 +17,7 @@ COPY gpu_training_results/outputs ./gpu_training_results/outputs
 COPY --from=frontend-build /app/frontend/build ./frontend/build
 COPY --from=frontend-build /app/frontend/node_modules ./frontend/node_modules
 COPY --from=frontend-build /app/frontend/package.json ./frontend/package.json
-COPY frontend/server.js ./frontend/server.js
+COPY frontend/server.cjs ./frontend/server.cjs
 COPY start.sh ./start.sh
 RUN chmod +x ./start.sh
 EXPOSE 3000
