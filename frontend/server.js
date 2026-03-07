@@ -1,7 +1,7 @@
 // frontend/server.js
-import { createRequestHandler } from "@react-router/express";
-import express from "express";
-import { createProxyMiddleware } from "http-proxy-middleware";
+const express = require("express");
+const { createProxyMiddleware } = require("http-proxy-middleware");
+const { createRequestHandler } = require("@react-router/express");
 
 const app = express();
 
@@ -15,7 +15,7 @@ app.use(
 
 app.use(
   createRequestHandler({
-    build: await import("./build/server/index.js"),
+    build: require("./build/server/index.js"),
   })
 );
 
