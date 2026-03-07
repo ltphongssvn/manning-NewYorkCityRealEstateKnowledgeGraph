@@ -20,7 +20,7 @@ describe('PropertiesScreen', () => {
     fireEvent.changeText(getByTestId('bbl-input'), '1008350041');
     fireEvent.press(getByTestId('search-btn'));
     await waitFor(() => expect(getByTestId('result')).toBeTruthy());
-    expect(getByText('5 AVENUE')).toBeTruthy();
+    expect(getByText('ESRT EMPIRE STATE BUILDING, L.L.C.')).toBeTruthy();
   });
   it('shows error on failed fetch', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({ ok: false });
