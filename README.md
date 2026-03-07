@@ -77,7 +77,7 @@ A fullstack knowledge graph application for exploring NYC property ownership net
 |---|---|
 | Frontend | Remix / React Router v7, TailwindCSS, TypeScript |
 | Backend | FastAPI, Python 3.11, scikit-learn |
-| Graph DB | Neo4j 5.26, APOC |
+| Graph DB | Neo4j 5.26 (local Docker), Neo4j AuraDB Free (production) |
 | ML Models | PyKEEN (TransE/TransR), node2vec, GraphSAGE |
 | GPU Hardware | 4× NVIDIA L4 (23GB VRAM each), CUDA 12.8 |
 | Infra | Docker, docker-compose, Railway |
@@ -91,6 +91,15 @@ Training was performed on a GPU cluster:
 - **Hardware**: 4× NVIDIA L4 GPU (23GB VRAM each), CUDA 12.8, Driver 570.172.08
 - **Notebook**: `gpu_training_results/notebooks/nyc_knowledge_graph_gpu.ipynb`
 - **Pipeline**: 21 cells — data prep → deduplication → node2vec → TransE/TransR → GraphSAGE → KNN recommender
+
+## Neo4j Database
+
+| Environment | Connection |
+|---|---|
+| Local (Docker) | `bolt://localhost:7687` (neo4j:5.26 container) |
+| Production | Neo4j AuraDB Free (`neo4j+s://3deb10fd.databases.neo4j.io`) |
+
+Data is seeded via `cypher/seed_neo4j.py` — batch-loads 100K NYC tax records (BBL + OWNER nodes, TAX_ASSESSOR_OWNER relationships) into AuraDB using `MERGE` in batches of 1,000.
 
 ### Training Results
 
