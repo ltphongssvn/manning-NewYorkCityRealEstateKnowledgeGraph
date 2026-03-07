@@ -17,18 +17,22 @@ describe("Recommend route", () => {
     expect(screen.getByTestId("bbl-input")).toBeTruthy();
   });
 
-  it("shows recommendations on successful fetch", async () => {
+  it("shows ranked recommendations on successful fetch", async () => {
     (global.fetch as any).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         bbl: "1008350041",
-        recommendations: [{ bbl: "1008350042", distance: 0.12 }],
+        recommendations: [
+          { bbl: "1008597501", distance: 0.2755 },
+          { bbl: "1010431132", distance: 0.2866 },
+        ],
       }),
     });
     render(<Recommend />);
     fireEvent.change(screen.getByTestId("bbl-input"), { target: { value: "1008350041" } });
     fireEvent.submit(screen.getByRole("button"));
     await waitFor(() => expect(screen.getByTestId("result")).toBeTruthy());
+    expect(screen.getByText("1008597501")).toBeTruthy();
   });
 
   it("shows error on failed fetch", async () => {

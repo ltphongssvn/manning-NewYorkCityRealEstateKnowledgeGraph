@@ -13,10 +13,11 @@ export default function Home() {
     <main className="min-h-screen bg-gray-950 text-white p-8">
       <h1 className="text-4xl font-bold mb-4">NYC Real Estate Knowledge Graph</h1>
       <p className="text-gray-400 mb-8">Explore property ownership networks across New York City.</p>
-      <nav className="flex gap-4">
+      <nav className="flex flex-wrap gap-4">
         <a href="/properties" className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700">Properties</a>
         <a href="/owners" className="px-4 py-2 bg-purple-600 rounded hover:bg-purple-700">Owners</a>
         <a href="/graph" className="px-4 py-2 bg-green-600 rounded hover:bg-green-700">Graph Explorer</a>
+        <a href="/recommend" className="px-4 py-2 bg-yellow-600 rounded hover:bg-yellow-700">Recommendations</a>
       </nav>
     </main>
   );
