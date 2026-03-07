@@ -8,3 +8,5 @@ frontend/.git
 *.md
 .github
 gpu_training_results/outputs/models
+!gpu_training_results/outputs/embeddings/node2vec_keys.npy
+!gpu_training_results/outputs/embeddings/node2vec_vecs.npy
