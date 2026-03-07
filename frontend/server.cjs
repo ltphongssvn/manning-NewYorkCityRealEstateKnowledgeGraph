@@ -6,7 +6,6 @@ const path = require("path");
 
 const app = express();
 
-// Serve static assets from Remix build
 app.use("/assets", express.static(path.join(__dirname, "build/client/assets")));
 app.use(express.static(path.join(__dirname, "build/client")));
 
@@ -15,6 +14,7 @@ app.use(
   createProxyMiddleware({
     target: "http://127.0.0.1:8001",
     changeOrigin: false,
+    pathRewrite: { "^/api": "/api" },
   })
 );
 
