@@ -1,9 +1,14 @@
-// frontend/server.js
+// frontend/server.cjs
 const express = require("express");
 const { createProxyMiddleware } = require("http-proxy-middleware");
 const { createRequestHandler } = require("@react-router/express");
+const path = require("path");
 
 const app = express();
+
+// Serve static assets from Remix build
+app.use("/assets", express.static(path.join(__dirname, "build/client/assets")));
+app.use(express.static(path.join(__dirname, "build/client")));
 
 app.use(
   "/api",
