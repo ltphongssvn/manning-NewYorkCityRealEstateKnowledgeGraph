@@ -10,11 +10,10 @@ app.use("/assets", express.static(path.join(__dirname, "build/client/assets")));
 app.use(express.static(path.join(__dirname, "build/client")));
 
 app.use(
-  "/api",
   createProxyMiddleware({
     target: "http://127.0.0.1:8001",
     changeOrigin: false,
-    pathRewrite: { "^/api": "/api" },
+    pathFilter: "/api",
   })
 );
 
