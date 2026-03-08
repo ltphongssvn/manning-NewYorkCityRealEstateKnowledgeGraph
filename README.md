@@ -87,9 +87,81 @@ How similar the ownership pattern is — closer to 0.0 = nearly identical networ
 
 Similarity is based on **who owns what and how they connect** across all 97,000 NYC properties — not physical location or building type.
 
+## 📱 Mobile Apps (Android & iOS)
+
+Built with React Native + Expo SDK 54. Same 5 features as the web app.
+
+### Android
+
+**Preview build** (no Metro required — install and run directly):
+[Download Android APK](https://expo.dev/accounts/ltphongssvn/projects/nyc-re-knowledge-graph/builds/81825e30-e700-4cc7-a378-9b77a9db6b04)
+
+1. Open the link above on your Android device
+2. Download and install the APK
+3. Allow installation from unknown sources if prompted
+
+### iOS
+
+**Preview build** (Ad Hoc distribution — registered devices only):
+[Download iOS IPA](https://expo.dev/accounts/ltphongssvn/projects/nyc-re-knowledge-graph/builds/58e41846-5a89-4f9c-8815-c983cd98dbd5)
+
+1. Open the link above on your iPhone
+2. Tap Install when prompted
+3. Go to Settings → General → VPN & Device Management → Trust the developer profile
+
+### Features
+- Property Search by BBL
+- Owner Search by name
+- Graph Explorer (ownership network traversal)
+- AI Recommendations (node2vec similarity)
+
+### Test Data
+| BBL | Property |
+|---|---|
+| `1008350041` | Empire State Building |
+| `1000010010` | Governors Island |
+
+Owner search: `ESRT EMPIRE STATE BUILDING, L.L.C.`
+
+## 🌐 Web App
+
+**Live URL:** https://nyc-kg-app.thanhphongle.net
+
+No installation required — open in any browser.
+
+### Features
+
+| Route | URL | Description |
+|---|---|---|
+| Home | `/` | Navigation hub |
+| Property Search | `/properties` | Look up a property by BBL |
+| Owner Search | `/owners` | Find all properties owned by a person or company |
+| Graph Explorer | `/graph` | Explore ownership networks |
+| Recommendations | `/recommend` | AI-similar properties via node2vec |
+
+### Test Data
+
+**Property Search** — enter a BBL:
+| BBL | Property |
+|---|---|
+| `1008350041` | Empire State Building, 5 AVENUE |
+| `1000010010` | Governors Island, COMFORT ROAD |
+| `1000010111` | Governors Island, ANDES ROAD |
+
+**Owner Search** — enter exact name:
+| Owner Name | Properties |
+|---|---|
+| `ESRT EMPIRE STATE BUILDING, L.L.C.` | Empire State Building |
+| `GOVERNORS ISLAND CORPORATION` | Governors Island properties |
+| `NYC PARKS DEPT` | NYC parks properties |
+
+**Graph Explorer** — enter BBL, see ownership network nodes and edges.
+
+**Recommendations** — enter BBL, get top 5 AI-similar properties. Distance closer to `0.0` = more similar ownership pattern.
+
 ## Architecture
 ```
-cat > README.md << 'EOF'
+
 # NYC Real Estate Knowledge Graph
 
 A fullstack knowledge graph application for exploring NYC property ownership networks, built with Remix, FastAPI, Neo4j, and GPU-trained ML embeddings.
@@ -250,7 +322,7 @@ Three node types and three relationship types encode ownership across data sourc
 
 **Infrastructure:** Docker (multi-stage) · Railway · GitHub Actions CI (5 jobs)
 
-**GPU Cluster (Harvard OOD):** 4× NVIDIA L4 (23GB VRAM each) · CUDA 12.8 · Driver 570.172.08 · TensorFlow 2.20 · PyTorch 2.10
+**GPU Cluster:** 4× NVIDIA L4 (23GB VRAM each) · CUDA 12.8 · Driver 570.172.08 · TensorFlow 2.20 · PyTorch 2.10
 
 **Testing:** pytest + vitest · 80% per-file coverage enforced · TDD (Red-Green-Refactor)
 
@@ -341,12 +413,10 @@ uv run uvicorn backend.app:app --reload
 cd frontend && npm ci && npm run dev
 ```
 
-### Using Harvard OOD GPU Cluster (ML training only)
+### Using GPU Cluster (ML training only)
 
-1. Go to [https://ood.huit.harvard.edu](https://ood.huit.harvard.edu)
-2. Click **Interactive Apps** > **Jupyter Lab - CS 1090B (GPU)**
-3. Launch, wait, and connect when ready
-4. Upload notebooks from `notebooks/` via the file browser
+1. Go to Google Colab
+2. Upload notebooks from `notebooks/` via the file browser
 
 ### Neo4j Setup
 
