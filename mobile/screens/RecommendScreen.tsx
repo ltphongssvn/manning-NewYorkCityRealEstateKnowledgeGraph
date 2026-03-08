@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
 const API_BASE = 'https://nyc-kg-app.thanhphongle.net';
@@ -21,39 +22,41 @@ export default function RecommendScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Pressable onPress={() => navigation.goBack()} testID="back-btn">
-        <Text style={styles.back}>← Home</Text>
-      </Pressable>
-      <Text style={styles.title}>Similar Property Recommendations</Text>
-      <Text style={styles.subtitle}>AI-powered similarity using node2vec embeddings trained on 97,000 NYC properties. Lower distance = more similar ownership pattern.</Text>
-      <TextInput style={styles.input} placeholder="Enter BBL (e.g. 1008350041)"
-        placeholderTextColor="#6b7280" value={bbl} onChangeText={setBbl} testID="bbl-input" />
-      <Pressable style={styles.btn} onPress={handleRecommend} testID="recommend-btn">
-        <Text style={styles.btnText}>Recommend</Text>
-      </Pressable>
-      {loading && <ActivityIndicator color="#fff" />}
-      {!!error && <Text style={styles.error} testID="error-msg">{error}</Text>}
-      {result && (
-        <View style={styles.card} testID="result">
-          <Text style={styles.field}><Text style={styles.label}>Query BBL: </Text>{result.bbl}</Text>
-          <Text style={styles.sectionTitle}>Top {result.recommendations?.length} similar properties by ownership network:</Text>
-          {result.recommendations?.map((r: any, i: number) => (
-            <View key={i} style={styles.row}>
-              <Text style={styles.rank}>#{i + 1}</Text>
-              <Text style={styles.bbl}>{r.bbl}</Text>
-              <Text style={styles.label}>distance: </Text>
-              <Text style={r.distance < 0.3 ? styles.near : styles.far}>{r.distance}</Text>
-            </View>
-          ))}
-        </View>
-      )}
-    </ScrollView>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Pressable onPress={() => navigation.goBack()} testID="back-btn">
+          <Text style={styles.back}>← Home</Text>
+        </Pressable>
+        <Text style={styles.title}>Similar Property Recommendations</Text>
+        <Text style={styles.subtitle}>AI-powered similarity using node2vec embeddings trained on 97,000 NYC properties. Lower distance = more similar ownership pattern.</Text>
+        <TextInput style={styles.input} placeholder="Enter BBL (e.g. 1008350041)"
+          placeholderTextColor="#6b7280" value={bbl} onChangeText={setBbl} testID="bbl-input" />
+        <Pressable style={styles.btn} onPress={handleRecommend} testID="recommend-btn">
+          <Text style={styles.btnText}>Recommend</Text>
+        </Pressable>
+        {loading && <ActivityIndicator color="#fff" />}
+        {!!error && <Text style={styles.error} testID="error-msg">{error}</Text>}
+        {result && (
+          <View style={styles.card} testID="result">
+            <Text style={styles.field}><Text style={styles.label}>Query BBL: </Text>{result.bbl}</Text>
+            <Text style={styles.sectionTitle}>Top {result.recommendations?.length} similar properties by ownership network:</Text>
+            {result.recommendations?.map((r: any, i: number) => (
+              <View key={i} style={styles.row}>
+                <Text style={styles.rank}>#{i + 1}</Text>
+                <Text style={styles.bbl}>{r.bbl}</Text>
+                <Text style={styles.label}>distance: </Text>
+                <Text style={r.distance < 0.3 ? styles.near : styles.far}>{r.distance}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#030712' },
+  safe: { flex: 1, backgroundColor: '#030712' },
   content: { padding: 24 },
   back: { color: '#60a5fa', marginBottom: 16 },
   title: { color: '#fff', fontSize: 24, fontWeight: 'bold', marginBottom: 8 },

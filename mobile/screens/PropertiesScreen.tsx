@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 
 const API_BASE = 'https://nyc-kg-app.thanhphongle.net';
@@ -21,34 +22,36 @@ export default function PropertiesScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Pressable onPress={() => navigation.goBack()} testID="back-btn">
-        <Text style={styles.back}>← Home</Text>
-      </Pressable>
-      <Text style={styles.title}>Property Search</Text>
-      <TextInput style={styles.input} placeholder="Enter BBL (e.g. 1008350041)" placeholderTextColor="#6b7280"
-        value={bbl} onChangeText={setBbl} testID="bbl-input" />
-      <Pressable style={styles.btn} onPress={handleSearch} testID="search-btn">
-        <Text style={styles.btnText}>Search</Text>
-      </Pressable>
-      {loading && <ActivityIndicator color="#fff" />}
-      {!!error && <Text style={styles.error} testID="error-msg">{error}</Text>}
-      {result && (
-        <View style={styles.card} testID="result">
-          <Text style={styles.field}><Text style={styles.label}>BBL: </Text>{result.bbl}</Text>
-          <Text style={styles.field}><Text style={styles.label}>Address: </Text>{result.address ?? 'N/A'}</Text>
-          <Text style={styles.field}><Text style={styles.label}>Owners ({result.owners?.length ?? 0}):</Text></Text>
-          {result.owners?.map((o: any, i: number) => (
-            <Text key={i} style={styles.item}>• {o.name} <Text style={styles.dim}>({o.relationship})</Text></Text>
-          ))}
-        </View>
-      )}
-    </ScrollView>
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Pressable onPress={() => navigation.goBack()} testID="back-btn">
+          <Text style={styles.back}>← Home</Text>
+        </Pressable>
+        <Text style={styles.title}>Property Search</Text>
+        <TextInput style={styles.input} placeholder="Enter BBL (e.g. 1008350041)" placeholderTextColor="#6b7280"
+          value={bbl} onChangeText={setBbl} testID="bbl-input" />
+        <Pressable style={styles.btn} onPress={handleSearch} testID="search-btn">
+          <Text style={styles.btnText}>Search</Text>
+        </Pressable>
+        {loading && <ActivityIndicator color="#fff" />}
+        {!!error && <Text style={styles.error} testID="error-msg">{error}</Text>}
+        {result && (
+          <View style={styles.card} testID="result">
+            <Text style={styles.field}><Text style={styles.label}>BBL: </Text>{result.bbl}</Text>
+            <Text style={styles.field}><Text style={styles.label}>Address: </Text>{result.address ?? 'N/A'}</Text>
+            <Text style={styles.field}><Text style={styles.label}>Owners ({result.owners?.length ?? 0}):</Text></Text>
+            {result.owners?.map((o: any, i: number) => (
+              <Text key={i} style={styles.item}>• {o.name} <Text style={styles.dim}>({o.relationship})</Text></Text>
+            ))}
+          </View>
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#030712' },
+  safe: { flex: 1, backgroundColor: '#030712' },
   content: { padding: 24 },
   back: { color: '#60a5fa', marginBottom: 16 },
   title: { color: '#fff', fontSize: 24, fontWeight: 'bold', marginBottom: 16 },
